@@ -39,7 +39,6 @@ public class Calculator {
                 return "Invalid";
         }
 
-        // Clean up decimal display for whole numbers
         if (result == (long) result) {
             return String.valueOf((long) result);
         } else {

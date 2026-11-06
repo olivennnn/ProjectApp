@@ -11,10 +11,9 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden; /* Prevents scrollbars from moving videos */
+            overflow: hidden;
         }
 
-        /* Background Video */
         #bg-video {
             position: fixed;
             top: 0;
@@ -25,20 +24,18 @@
             object-fit: cover;
         }
 
-        /* Floating Unicorn Video */
         #unicorn-video {
             position: fixed;
             width: 200px;
             height: 200px;
             object-fit: cover;
-            border-radius: 50%; /* Makes it look like a bubble */
+            border-radius: 50%;
             z-index: -1;
             opacity: 0.85;
             box-shadow: 0 0 25px rgba(255, 182, 193, 0.8);
             animation: floatBubble 12s infinite alternate ease-in-out;
         }
 
-        /* Bouncing/Floating Animation Keyframes */
         @keyframes floatBubble {
             0% { top: 5%; left: 10%; transform: scale(1); }
             25% { top: 30%; left: 70%; transform: scale(1.1); }
@@ -47,7 +44,6 @@
             100% { top: 15%; left: 15%; transform: scale(1); }
         }
 
-        /* 67.mp4 Easter Egg Popup */
         #popup-67 {
             position: fixed;
             top: 50%;
@@ -61,7 +57,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
-        /* Welcome Overlay Styles */
         #welcome-overlay {
             position: fixed;
             top: 0;
@@ -98,7 +93,6 @@
             transform: scale(1.05);
         }
 
-        /* Calculator Styles */
         .calculator {
             background: linear-gradient(135deg, rgba(165, 203, 250, 0.9), rgba(244, 184, 228, 0.9), rgba(168, 240, 204, 0.9));
             padding: 20px;
@@ -169,14 +163,11 @@
 </head>
 <body>
 
-<!-- Looping Background Videos -->
 <video id="bg-video" loop src="BG.mp4"></video>
 <video id="unicorn-video" loop src="Unicorn.mp4"></video>
 
-<!-- Popup Video for Easter Egg (Hidden by default) -->
 <video id="popup-67" src="67.mp4" controls></video>
 
-<!-- Explicit Audio Elements -->
 <audio id="sound-0" src="0.mp3"></audio>
 <audio id="sound-1" src="1.mp3"></audio>
 <audio id="sound-2" src="2.mp3"></audio>
@@ -189,54 +180,48 @@
 <audio id="sound-9" src="9.mp3"></audio>
 <audio id="sound-dot" src="Dot.mp3"></audio>
 
-<!-- Updated Clear Audio Elements -->
 <audio id="sound-c" src="C.mp3"></audio>
 <audio id="sound-ce" src="CE.mp3"></audio>
 
-<!-- Added Operator Audio Elements -->
 <audio id="sound-add" src="Add.mp3"></audio>
 <audio id="sound-minus" src="Minus.mp3"></audio>
 <audio id="sound-times" src="times.mp3"></audio>
 <audio id="sound-divide" src="Divide.mp3"></audio>
 
 <audio id="sound-equals" src="equal.m4a"></audio>
+<audio id="errorSound" src="error1.mp3"></audio>
 <audio id="sound-greeting" src="Greetings.mp3"></audio>
 
-<!-- Welcome Popup Overlay -->
 <div id="welcome-overlay">
     <h1>Welcome to the Calculator!</h1>
-    <button class="proceed-btn" onclick="startCalculator()">Proceed to calculator</button>
+    <button class="proceed-btn" onclick="startCalculator()">Proceed to Calculator</button>
 </div>
 
 <div class="calculator">
     <input type="text" id="display" value="0" aria-label="Calculator display" readonly>
 
     <div class="buttons-grid">
-        <!-- Row 1 -->
+
         <button class="clear" onclick="clearCalculator()">C</button>
         <button class="clear" onclick="clearEntry()">CE</button>
         <button class="operator" onclick="setOp('/')">÷</button>
         <button class="operator" onclick="setOp('*')">×</button>
 
-        <!-- Row 2 -->
         <button onclick="appendInput('7')">7</button>
         <button onclick="appendInput('8')">8</button>
         <button onclick="appendInput('9')">9</button>
         <button class="operator" onclick="setOp('-')">-</button>
 
-        <!-- Row 3 -->
         <button onclick="appendInput('4')">4</button>
         <button onclick="appendInput('5')">5</button>
         <button onclick="appendInput('6')">6</button>
         <button class="operator" onclick="setOp('+')">+</button>
 
-        <!-- Row 4 -->
         <button onclick="appendInput('1')">1</button>
         <button onclick="appendInput('2')">2</button>
         <button onclick="appendInput('3')">3</button>
         <button class="equals" onclick="calculateResult()" style="grid-row: span 2; height: 100%;">=</button>
 
-        <!-- Row 5 -->
         <button onclick="toggleSign()">+/-</button>
         <button onclick="appendInput('0')">0</button>
         <button onclick="appendInput('.')">.</button>
@@ -248,12 +233,18 @@
     let firstNum = null;
     let operation = null;
     let resetScreen = false;
-    let lastDigitClick = null; // Tracks the last clicked digit for the 6 & 7 easter egg
+    let lastDigitClick = null;
 
     const display = document.getElementById("display");
 
-    // Generic function to safely play an audio element by ID
     function playAudio(elementId) {
+        if (elementId !== 'sound-equals' && elementId !== 'errorSound') {
+            const eqSound = document.getElementById("sound-equals");
+            const errSound = document.getElementById("errorSound");
+            if (eqSound) { eqSound.pause(); eqSound.currentTime = 0; }
+            if (errSound) { errSound.pause(); errSound.currentTime = 0; }
+        }
+
         const sound = document.getElementById(elementId);
         if (sound) {
             sound.currentTime = 0;
@@ -266,11 +257,9 @@
         overlay.style.opacity = "0";
         setTimeout(() => overlay.style.display = "none", 500);
 
-        // Start playing the background videos now that user has interacted (fixes autoplay restrictions)
         document.getElementById("bg-video").play().catch(e => console.log(e));
         document.getElementById("unicorn-video").play().catch(e => console.log(e));
 
-        // Play greetings
         playAudio("sound-greeting");
     }
 
@@ -279,29 +268,36 @@
     }
 
     function appendInput(val) {
-        // --- 6 THEN 7 EASTER EGG LOGIC ---
         if (val === '7' && lastDigitClick === '6') {
             const popupVideo = document.getElementById("popup-67");
             popupVideo.style.display = "block";
             popupVideo.currentTime = 0;
             popupVideo.play().catch(e => console.log(e));
+            popupOpenTime = Date.now();
 
-            // Hide the video again when it finishes playing
             popupVideo.onended = () => {
                 popupVideo.style.display = "none";
+                popupOpenTime = 0;
             };
         }
-        // Update the tracker
+
+        document.addEventListener("click", () => {
+            const popupVideo = document.getElementById("popup-67");
+            if (popupVideo.style.display === "block" && Date.now() - popupOpenTime > 300) {
+                popupVideo.pause();
+                popupVideo.style.display = "none";
+                popupOpenTime = 0;
+            }
+        });
+
         lastDigitClick = val;
 
-        // --- SOUND LOGIC ---
         if (val === ".") {
             playAudio("sound-dot");
         } else if (!isNaN(val)) {
             playAudio("sound-" + val);
         }
 
-        // --- CALCULATOR LOGIC ---
         if (resetScreen) {
             currentInput = val === "." ? "0." : val;
             resetScreen = false;
@@ -328,9 +324,8 @@
     }
 
     async function setOp(nextOp) {
-        lastDigitClick = null; // reset easter egg tracker on operation
+        lastDigitClick = null;
 
-        // Play appropriate operator sound
         if (nextOp === '+') playAudio("sound-add");
         else if (nextOp === '-') playAudio("sound-minus");
         else if (nextOp === '*') playAudio("sound-times");
@@ -359,7 +354,7 @@
     }
 
     async function executeBackendCalculation() {
-        if (firstNum === null || operation === null) return;
+        if (firstNum === null || operation === null) return false;
 
         const num1 = firstNum;
         const num2 = currentInput;
@@ -374,6 +369,15 @@
             const response = await fetch(`/calculate?num1=${num1}&num2=${num2}&operation=${opParam}`);
             let result = await response.text();
 
+            if (result === "Error" || result === "Invalid") {
+                playAudio("errorSound");
+                currentInput = result;
+                firstNum = null;
+                operation = null;
+                updateDisplay();
+                return true;
+            }
+
             if (result.length > 13) {
                 result = result.substring(0, 13);
             }
@@ -381,30 +385,35 @@
             currentInput = result;
             firstNum = result;
             updateDisplay();
+            return false; // No error
         } catch (error) {
             currentInput = "Error";
             firstNum = null;
             operation = null;
             updateDisplay();
+            playAudio("errorSound");
+            return true;
         }
     }
 
     async function calculateResult() {
-        lastDigitClick = null; // reset easter egg tracker
+        lastDigitClick = null;
         if (firstNum === null || operation === null) return;
 
-        playAudio("sound-equals");
-        await executeBackendCalculation();
+        let hasError = await executeBackendCalculation();
+
+        if (!hasError) {
+            playAudio("sound-equals");
+        }
 
         firstNum = null;
         operation = null;
         resetScreen = true;
     }
 
-    // Connected to the 'C' button
     function clearCalculator() {
         lastDigitClick = null;
-        playAudio("sound-c"); // Updated to use C.mp3
+        playAudio("sound-c");
         currentInput = "0";
         firstNum = null;
         operation = null;
@@ -412,10 +421,9 @@
         updateDisplay();
     }
 
-    // Connected to the 'CE' (Clear Entry) button
     function clearEntry() {
         lastDigitClick = null;
-        playAudio("sound-ce"); // Updated to use CE.mp3
+        playAudio("sound-ce");
         if (resetScreen) {
             resetScreen = false;
         }
@@ -430,6 +438,5 @@
         updateDisplay();
     }
 </script>
-
 </body>
 </html>
