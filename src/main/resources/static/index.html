@@ -5,24 +5,108 @@
     <title>Calculator</title>
     <style>
         body {
-            background-image: url("hamster.jfif");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden; /* Prevents scrollbars from moving videos */
         }
+
+        /* Background Video */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -2;
+            object-fit: cover;
+        }
+
+        /* Floating Unicorn Video */
+        #unicorn-video {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%; /* Makes it look like a bubble */
+            z-index: -1;
+            opacity: 0.85;
+            box-shadow: 0 0 25px rgba(255, 182, 193, 0.8);
+            animation: floatBubble 12s infinite alternate ease-in-out;
+        }
+
+        /* Bouncing/Floating Animation Keyframes */
+        @keyframes floatBubble {
+            0% { top: 5%; left: 10%; transform: scale(1); }
+            25% { top: 30%; left: 70%; transform: scale(1.1); }
+            50% { top: 75%; left: 80%; transform: scale(0.95); }
+            75% { top: 60%; left: 20%; transform: scale(1.15); }
+            100% { top: 15%; left: 15%; transform: scale(1); }
+        }
+
+        /* 67.mp4 Easter Egg Popup */
+        #popup-67 {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            z-index: 10000;
+            display: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        /* Welcome Overlay Styles */
+        #welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #welcome-overlay h1 {
+            color: #d946ef;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .proceed-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #ffd1dc;
+            color: #d946ef;
+            border: 2px solid #fbcfe8;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .proceed-btn:hover {
+            background-color: #fbcfe8;
+            transform: scale(1.05);
+        }
+
+        /* Calculator Styles */
         .calculator {
             background: linear-gradient(135deg, rgba(165, 203, 250, 0.9), rgba(244, 184, 228, 0.9), rgba(168, 240, 204, 0.9));
             padding: 20px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 280px;
-            border: 4px solid #ffd1dc; /* Soft pastel pink border */
+            border: 4px solid #ffd1dc;
+            z-index: 10;
         }
         #display {
             width: 100%;
@@ -60,23 +144,22 @@
             background-color: #e2e8f0;
             transform: scale(1.02);
         }
-        /* Rainbow/Pastel themed operators */
         .operator {
-            background-color: #ffd1dc; /* Pastel Pink */
+            background-color: #ffd1dc;
             color: #d946ef;
         }
         .operator:hover {
             background-color: #fbcfe8;
         }
         .equals {
-            background-color: #bae6fd; /* Pastel Sky Blue */
+            background-color: #bae6fd;
             color: #0284c7;
         }
         .equals:hover {
             background-color: #7dd3fc;
         }
         .clear {
-            background-color: #fde68a; /* Pastel Yellow */
+            background-color: #fde68a;
             color: #d97706;
         }
         .clear:hover {
@@ -86,10 +169,47 @@
 </head>
 <body>
 
-<div class="calculator">
-    <audio id="equalsSound" src="equal.m4a"></audio>
+<!-- Looping Background Videos -->
+<video id="bg-video" loop src="BG.mp4"></video>
+<video id="unicorn-video" loop src="Unicorn.mp4"></video>
 
-    <input type="text" id="display" value="0" readonly>
+<!-- Popup Video for Easter Egg (Hidden by default) -->
+<video id="popup-67" src="67.mp4" controls></video>
+
+<!-- Explicit Audio Elements -->
+<audio id="sound-0" src="0.mp3"></audio>
+<audio id="sound-1" src="1.mp3"></audio>
+<audio id="sound-2" src="2.mp3"></audio>
+<audio id="sound-3" src="3.mp3"></audio>
+<audio id="sound-4" src="4.mp3"></audio>
+<audio id="sound-5" src="5.mp3"></audio>
+<audio id="sound-6" src="6.mp3"></audio>
+<audio id="sound-7" src="7.mp3"></audio>
+<audio id="sound-8" src="8.mp3"></audio>
+<audio id="sound-9" src="9.mp3"></audio>
+<audio id="sound-dot" src="Dot.mp3"></audio>
+
+<!-- Updated Clear Audio Elements -->
+<audio id="sound-c" src="C.mp3"></audio>
+<audio id="sound-ce" src="CE.mp3"></audio>
+
+<!-- Added Operator Audio Elements -->
+<audio id="sound-add" src="Add.mp3"></audio>
+<audio id="sound-minus" src="Minus.mp3"></audio>
+<audio id="sound-times" src="times.mp3"></audio>
+<audio id="sound-divide" src="Divide.mp3"></audio>
+
+<audio id="sound-equals" src="equal.m4a"></audio>
+<audio id="sound-greeting" src="Greetings.mp3"></audio>
+
+<!-- Welcome Popup Overlay -->
+<div id="welcome-overlay">
+    <h1>Welcome to the Calculator!</h1>
+    <button class="proceed-btn" onclick="startCalculator()">Proceed to calculator</button>
+</div>
+
+<div class="calculator">
+    <input type="text" id="display" value="0" aria-label="Calculator display" readonly>
 
     <div class="buttons-grid">
         <!-- Row 1 -->
@@ -128,14 +248,60 @@
     let firstNum = null;
     let operation = null;
     let resetScreen = false;
+    let lastDigitClick = null; // Tracks the last clicked digit for the 6 & 7 easter egg
 
     const display = document.getElementById("display");
+
+    // Generic function to safely play an audio element by ID
+    function playAudio(elementId) {
+        const sound = document.getElementById(elementId);
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log("Audio blocked:", e));
+        }
+    }
+
+    function startCalculator() {
+        const overlay = document.getElementById("welcome-overlay");
+        overlay.style.opacity = "0";
+        setTimeout(() => overlay.style.display = "none", 500);
+
+        // Start playing the background videos now that user has interacted (fixes autoplay restrictions)
+        document.getElementById("bg-video").play().catch(e => console.log(e));
+        document.getElementById("unicorn-video").play().catch(e => console.log(e));
+
+        // Play greetings
+        playAudio("sound-greeting");
+    }
 
     function updateDisplay() {
         display.value = currentInput;
     }
 
     function appendInput(val) {
+        // --- 6 THEN 7 EASTER EGG LOGIC ---
+        if (val === '7' && lastDigitClick === '6') {
+            const popupVideo = document.getElementById("popup-67");
+            popupVideo.style.display = "block";
+            popupVideo.currentTime = 0;
+            popupVideo.play().catch(e => console.log(e));
+
+            // Hide the video again when it finishes playing
+            popupVideo.onended = () => {
+                popupVideo.style.display = "none";
+            };
+        }
+        // Update the tracker
+        lastDigitClick = val;
+
+        // --- SOUND LOGIC ---
+        if (val === ".") {
+            playAudio("sound-dot");
+        } else if (!isNaN(val)) {
+            playAudio("sound-" + val);
+        }
+
+        // --- CALCULATOR LOGIC ---
         if (resetScreen) {
             currentInput = val === "." ? "0." : val;
             resetScreen = false;
@@ -162,6 +328,14 @@
     }
 
     async function setOp(nextOp) {
+        lastDigitClick = null; // reset easter egg tracker on operation
+
+        // Play appropriate operator sound
+        if (nextOp === '+') playAudio("sound-add");
+        else if (nextOp === '-') playAudio("sound-minus");
+        else if (nextOp === '*') playAudio("sound-times");
+        else if (nextOp === '/') playAudio("sound-divide");
+
         if (firstNum !== null && operation !== null && !resetScreen) {
             await executeBackendCalculation();
         } else {
@@ -173,6 +347,7 @@
     }
 
     function toggleSign() {
+        lastDigitClick = null;
         if (currentInput === "0") return;
 
         if (currentInput.startsWith("-")) {
@@ -215,14 +390,10 @@
     }
 
     async function calculateResult() {
+        lastDigitClick = null; // reset easter egg tracker
         if (firstNum === null || operation === null) return;
 
-        const sound = document.getElementById("equalsSound");
-        sound.currentTime = 0;
-        sound.play().catch(error => {
-            console.log("Audio play blocked or failed:", error);
-        });
-
+        playAudio("sound-equals");
         await executeBackendCalculation();
 
         firstNum = null;
@@ -230,7 +401,10 @@
         resetScreen = true;
     }
 
+    // Connected to the 'C' button
     function clearCalculator() {
+        lastDigitClick = null;
+        playAudio("sound-c"); // Updated to use C.mp3
         currentInput = "0";
         firstNum = null;
         operation = null;
@@ -238,7 +412,10 @@
         updateDisplay();
     }
 
+    // Connected to the 'CE' (Clear Entry) button
     function clearEntry() {
+        lastDigitClick = null;
+        playAudio("sound-ce"); // Updated to use CE.mp3
         if (resetScreen) {
             resetScreen = false;
         }
